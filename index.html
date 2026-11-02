@@ -9,99 +9,339 @@
 <meta name="apple-mobile-web-app-title" content="Temporizador">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Temporizador</title>
+<title>Temporizador y reloj 3.0</title>
 <style>
-:root{color-scheme:dark;--green:#00FF00;--yellow:#FFFF00;--red:#FF0000;--accent:#00FF00}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
-body{min-height:100svh;overscroll-behavior:none}button,input{font:inherit}
+:root { color-scheme:dark; --green:#00FF00;--yellow:#FFFF00;--red:#FF0000; }
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;width:100%;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{min-height:100svh;overscroll-behavior:none}button,input,select{font:inherit}
 main{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));gap:12px}
-header{width:100%;display:flex;align-items:center;justify-content:space-between;max-width:900px;gap:10px}
-header .name{font-size:13px;color:#8a8a8a;letter-spacing:.06em;text-transform:uppercase}
-header .tools{display:flex;gap:8px;align-items:center}#modeBtn,#settingsBtn{background:#191919;border:1px solid #555;color:white;border-radius:12px;padding:11px 14px;cursor:pointer}
-.display{display:flex;justify-content:center;align-items:center;flex:1;width:100%;min-height:100px;overflow:hidden}
-#clock{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.045em;white-space:nowrap;color:var(--accent);line-height:1;font-size:clamp(48px,24vw,240px);user-select:none;-webkit-user-select:none}
+header{width:100%;max-width:900px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+#status{font-size:12px;color:#a6a6a6;letter-spacing:.05em;text-transform:uppercase;max-width:40%;line-height:1.3}
+.tools{display:flex;gap:8px;align-items:center}
+#modeBtn,#settingsBtn{background:#191919;border:1px solid #555;color:#fff;border-radius:12px;padding:11px 14px;cursor:pointer;font-size:14px}
+.display{display:flex;align-items:center;justify-content:center;flex:1;width:100%;min-height:100px;overflow:hidden}
+#clock{display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.045em;white-space:nowrap;color:var(--green);line-height:1;font-size:100px;user-select:none;-webkit-user-select:none}
 footer{width:100%;max-width:700px;display:flex;align-items:center;gap:10px}
 footer button{min-height:54px;border-radius:14px;border:1px solid #444;background:#191919;color:#fff;cursor:pointer;flex:1;font-size:16px;font-weight:650}
-footer #startBtn{border-color:#777;background:#333}
-[hidden]{display:none!important}button:active{filter:brightness(1.35)}
-dialog{background:#141414;color:#fff;border:1px solid #666;border-radius:18px;width:min(92vw,430px);padding:22px;box-shadow:0 0 0 100vmax #000b}
-dialog::backdrop{background:#000b}h2{margin:0 0 20px;font-size:22px}
-label{display:block;font-size:15px;margin:15px 0 7px;color:#ddd}
-input[type=number],input[type=time]{display:block;width:100%;background:#242424;border:1px solid #666;color:#fff;padding:12px;border-radius:10px;font-size:18px}
-input[type=range]{width:100%;accent-color:#00ff00}
-.small{color:#aaa;font-size:13px;line-height:1.4;margin-top:6px}
-.actions{display:flex;gap:10px;margin-top:23px}.actions button{flex:1;padding:13px;border-radius:10px;background:#333;border:1px solid #555;color:#fff}.actions .save{background:#eaeaea;color:#000}
-@media(orientation:landscape){main{padding:8px max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));gap:0}header .name{font-size:11px}#settingsBtn,#modeBtn{padding:7px 12px}footer button{min-height:39px;font-size:13px}footer{max-width:480px}#clock{font-size:clamp(42px,34vh,260px)}}
+#startBtn{background:#333;border-color:#777}
+button:active{filter:brightness(1.4)}[hidden]{display:none!important}
+dialog{background:#141414;color:#fff;border:1px solid #666;border-radius:18px;width:min(94vw,480px);max-height:min(88svh,760px);overflow-y:auto;padding:20px;box-shadow:0 0 0 100vmax #000b}
+dialog::backdrop{background:#000b}h2{font-size:23px;margin:0 0 14px}
+fieldset{border:1px solid #393939;border-radius:12px;padding:10px 12px;margin:0 0 10px}
+legend{font-weight:650;font-size:15px;padding:0 5px}
+.mode-options{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.mode-options label{display:inline-flex;align-items:center;gap:5px;margin:0;color:#fff;font-size:14px}
+.mode-options input{accent-color:var(--green)}
+label{display:block;font-size:14px;margin:14px 0 7px;color:#e4e4e4}
+input[type=text],input[type=time],select{display:block;width:100%;background:#242424;border:1px solid #666;color:#fff;padding:12px;border-radius:10px;font-size:18px;min-height:48px}
+input[type=range]{width:100%;accent-color:var(--green)}
+.small{color:#a8a8a8;font-size:13px;line-height:1.35;margin:5px 0 11px}
+.check-row{display:flex;align-items:center;gap:9px;font-size:14px;margin:12px 0 4px;color:#eee}
+.check-row input{width:19px;height:19px;accent-color:var(--green)}
+.audio-controls{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.audio-controls button{background:#333;border:1px solid #666;border-radius:10px;color:#fff;padding:12px 14px;min-height:48px;white-space:nowrap}
+.actions{display:flex;gap:10px;margin-top:20px;position:sticky;bottom:-20px;padding:10px 0 2px;background:#141414}
+.actions button{flex:1;padding:13px;border-radius:10px;background:#333;border:1px solid #555;color:#fff;min-height:48px}
+.actions .save{background:#eaeaea;color:#000}
+@media(orientation:landscape){main{padding:8px max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));gap:0}
+#status{font-size:11px}#settingsBtn,#modeBtn{padding:7px 12px}footer button{min-height:39px;font-size:13px}footer{max-width:480px}}
+@media(max-width:365px){#status{font-size:11px}.tools{gap:5px}#modeBtn,#settingsBtn{padding:9px 10px;font-size:12px}}
 </style>
 </head>
 <body>
 <main>
-<header><span class="name" id="status">Listo</span><div class="tools"><button id="modeBtn" type="button" aria-label="Cambiar entre temporizador y reloj">Modo reloj</button><button id="settingsBtn" type="button" aria-label="Abrir configuración">Configurar</button></div></header>
+<header>
+<span id="status" aria-live="polite">Listo</span>
+<div class="tools"><button id="modeBtn" type="button">Modo reloj</button><button id="settingsBtn" type="button">Configurar</button></div>
+</header>
 <div class="display"><div id="clock" role="timer" aria-live="off">05:00</div></div>
-<footer><button id="startBtn" type="button">Iniciar</button><button id="resetBtn" type="button">Reiniciar</button></footer>
+<footer id="controls"><button id="startBtn" type="button">Iniciar</button><button id="resetBtn" type="button">Reiniciar</button></footer>
 </main>
-<dialog id="settings">
-<form method="dialog" id="settingsForm">
-<h2>Configuración</h2>
-<label for="minutes">Duración inicial (minutos)</label><input id="minutes" type="number" min="0" max="9999" step="1" inputmode="numeric" required>
-<label for="seconds">Segundos (0–59)</label><input id="seconds" type="number" min="0" max="59" step="1" inputmode="numeric" required>
-<label for="threshold">Cambiar a amarillo al <strong id="thresholdValue">75 %</strong> del tiempo transcurrido</label>
+<dialog id="settings" aria-labelledby="settingsTitle">
+<form id="settingsForm" novalidate>
+<h2 id="settingsTitle">Configuración</h2>
+<fieldset>
+<legend>¿Cómo quieres definir el término?</legend>
+<div class="mode-options">
+<label><input type="radio" name="timerType" value="duration" checked> Duración</label>
+<label><input type="radio" name="timerType" value="target"> Hora de término</label>
+</div>
+</fieldset>
+<div id="durationSection">
+<label for="durationInput">Duración (mm:ss o hh:mm:ss)</label>
+<input id="durationInput" type="text" inputmode="text" placeholder="05:00 o 01:30:00" autocomplete="off" spellcheck="false">
+<p class="small">Ejemplos: 05:00 son 5 minutos; 01:30:00 es 1 hora y 30 minutos. Dos campos siempre significan minutos y segundos.</p>
+</div>
+<div id="targetSection" hidden>
+<label for="targetInput">Hora de término (hora local del iPhone)</label>
+<input id="targetInput" type="time" step="60" value="18:00">
+<p class="small">Ejemplo: 18:00. La cuenta termina a esa hora; si ya pasó, se programa para el día siguiente. El porcentaje amarillo se calcula desde que presionas Iniciar.</p>
+</div>
+<label for="threshold">Amarillo al <strong id="thresholdValue">75 %</strong> del tiempo transcurrido</label>
 <input id="threshold" type="range" min="1" max="100" step="1" value="75">
-<label for="size">Tamaño de los números: <strong id="sizeValue">100 %</strong></label>
+<label for="size">Tamaño de números: <strong id="sizeValue">100 %</strong></label>
 <input id="size" type="range" min="50" max="150" step="5" value="100">
-<p class="small">Al llegar a 00:00, el reloj continúa contando hacia adelante en rojo. Guardar reinicia el tiempo.</p>
+<fieldset style="margin-top:14px">
+<legend>Aviso sonoro</legend>
+<label class="check-row"><input id="soundAtYellow" type="checkbox"> Sonido cuando cambie a amarillo</label>
+<label class="check-row"><input id="soundAtZero" type="checkbox" checked> Sonido al llegar a 00:00</label>
+<div class="audio-controls">
+<div>
+<label for="soundType">Tipo de sonido</label>
+<select id="soundType"><option value="single">Un pitido</option><option value="triple">Tres pitidos</option><option value="urgent">Aviso urgente</option></select>
+</div>
+<button id="testSound" type="button">Probar</button>
+</div>
+<label for="volume">Volumen: <strong id="volumeValue">60 %</strong></label>
+<input id="volume" type="range" min="0" max="100" step="5" value="60">
+<p class="small">El audio requiere interacción con la aplicación y no está garantizado si iOS la suspende o bloquea.</p>
+</fieldset>
+<p class="small">Después de llegar a cero, los números se ponen rojos y comienza el conteo ascendente. Guardar reinicia la cuenta.</p>
 <div class="actions"><button type="button" id="cancelBtn">Cancelar</button><button type="submit" class="save">Guardar</button></div>
 </form>
 </dialog>
 <script>
 (()=>{
 'use strict';
-const $=id=>document.getElementById(id), clock=$('clock'),status=$('status'),start=$('startBtn');
-const defaults={duration:300,threshold:75,size:100};let conf={...defaults};
-try{const stored=JSON.parse(localStorage.getItem('temporizador-config')||'{}');
-if(Number.isInteger(stored.duration)&&stored.duration>0&&stored.duration<=599999&&Number.isInteger(stored.threshold)&&stored.threshold>=1&&stored.threshold<=100&&Number.isInteger(stored.size)&&stored.size>=50&&stored.size<=150) conf=stored;}catch(e){}
-let remainingMs=conf.duration*1000, running=false, deadline=0, mode="timer";
-function fmt(seconds){const abs=Math.max(0,Math.floor(Math.abs(seconds)));return String(Math.floor(abs/60)).padStart(2,'0')+':'+String(abs%60).padStart(2,'0');}
-function remaining(){return running?deadline-performance.now():remainingMs;}
-function render(){if(mode==='clock'){
-const now=new Date();clock.style.color='#00FF00';clock.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-status.textContent='Hora actual';$('modeBtn').textContent='Modo temporizador';$('settingsBtn').hidden=true;document.querySelector('footer').hidden=true;fit();return;
+const $=id=>document.getElementById(id);
+const display=$('clock'), status=$('status'), start=$('startBtn');
+const CONFIG_KEY='temporizador-config-v3';
+const defaults={type:'duration',duration:300,targetTime:'18:00',threshold:75,size:100,soundAtYellow:false,soundAtZero:true,soundType:'triple',volume:60};
+let conf={...defaults};
+const validInt=(n,a,b)=>Number.isInteger(n)&&n>=a&&n<=b;
+const validTime=t=>typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+function loadConfig(){
+  try{
+    // Compatibilidad con las configuraciones guardadas en versiones anteriores.
+    const old=JSON.parse(localStorage.getItem('temporizador-config')||'null');
+    if(old&&validInt(old.duration,1,599999)) conf.duration=old.duration;
+    if(old&&validInt(old.threshold,1,100)) conf.threshold=old.threshold;
+    if(old&&validInt(old.size,50,150)) conf.size=old.size;
+    const saved=JSON.parse(localStorage.getItem(CONFIG_KEY)||'null');
+    if(!saved||typeof saved!=='object')return;
+    if(['duration','target'].includes(saved.type))conf.type=saved.type;
+    if(validInt(saved.duration,1,3599999))conf.duration=saved.duration;
+    if(validTime(saved.targetTime))conf.targetTime=saved.targetTime;
+    if(validInt(saved.threshold,1,100))conf.threshold=saved.threshold;
+    if(validInt(saved.size,50,150))conf.size=saved.size;
+    if(typeof saved.soundAtYellow==='boolean')conf.soundAtYellow=saved.soundAtYellow;
+    if(typeof saved.soundAtZero==='boolean')conf.soundAtZero=saved.soundAtZero;
+    if(['single','triple','urgent'].includes(saved.soundType))conf.soundType=saved.soundType;
+    if(validInt(saved.volume,0,100))conf.volume=saved.volume;
+  }catch(e){/* Usar valores predeterminados si la configuración es inválida. */}
 }
-$('modeBtn').textContent='Modo reloj';$('settingsBtn').hidden=false;document.querySelector('footer').hidden=false;
-let ms=remaining();let overtime=ms<=0;
-// El color amarillo se activa cuando se ha consumido el porcentaje configurado.
-const passed=100-Math.max(0,ms)/(conf.duration*1000)*100;
-const c=overtime?'#FF0000':passed>=conf.threshold?'#FFFF00':'#00FF00';
-clock.style.color=c;clock.textContent=fmt(overtime?Math.abs(ms)/1000:Math.ceil(ms/1000));
-status.textContent=overtime?'Tiempo extra':running?'En curso':(remainingMs===conf.duration*1000?'Listo':'En pausa');
-start.textContent=running?'Pausar':'Iniciar';fit();}
-function fit(){// Ajusta el texto para evitar que se corte, respetando el control de tamaño.
-const area=document.querySelector('.display');const availableWidth=area.clientWidth-4;const availableHeight=area.clientHeight-4;
-if(availableWidth<=0||availableHeight<=0)return;
-const base=Math.min(availableHeight*.88,availableWidth/5.3);
-clock.style.fontSize=Math.max(24,base*conf.size/100)+'px';
-// Medida real para evitar desbordes en pantallas con fuentes distintas.
-if(clock.scrollWidth>availableWidth){const actual=parseFloat(clock.style.fontSize);clock.style.fontSize=actual*(availableWidth/clock.scrollWidth)+'px';}
+loadConfig();
+let mode='timer';
+let state={running:false,started:false,remainingMs:conf.duration*1000,deadline:0,targetEpoch:0,initialMs:conf.duration*1000,yellowFired:false,zeroFired:false};
+let audioCtx=null, wakeLock=null;
+function nextTarget(value){
+  const [hours,minutes]=value.split(':').map(Number);
+  const now=new Date(), date=new Date(now);
+  date.setHours(hours,minutes,0,0);
+  if(date.getTime()<=now.getTime())date.setDate(date.getDate()+1);
+  return date.getTime();
 }
-function tick(){if(running||mode==='clock')render();requestAnimationFrame(tick);}
-function toggle(){if(mode!=='timer')return;if(running){remainingMs=deadline-performance.now();running=false;}else{deadline=performance.now()+remainingMs;running=true;requestWake();}render();}
-function reset(){if(mode!=='timer')return;running=false;remainingMs=conf.duration*1000;render();}
-let wakeLock=null;
-async function requestWake(){if(!('wakeLock'in navigator)||document.visibilityState!=='visible')return;try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}}
-document.addEventListener('visibilitychange',()=>{if(running&&document.visibilityState==='visible')requestWake();render();});
-$('modeBtn').addEventListener('click',()=>{if(mode==='timer'){if(running){remainingMs=deadline-performance.now();running=false;}mode='clock';requestWake();}else{mode='timer';}render();});
-start.addEventListener('click',toggle);$('resetBtn').addEventListener('click',reset);
-function openSettings(){if(running){remainingMs=deadline-performance.now();running=false;}
-$('minutes').value=Math.floor(conf.duration/60);$('seconds').value=conf.duration%60;
-$('threshold').value=conf.threshold;$('size').value=conf.size;labels();$('settings').showModal();render();}
-function labels(){$('thresholdValue').textContent=$('threshold').value+' %';$('sizeValue').textContent=$('size').value+' %';}
-$('settingsBtn').addEventListener('click',openSettings);$('threshold').addEventListener('input',labels);$('size').addEventListener('input',labels);
+function resetState(){
+  state.running=false;state.started=false;
+  state.yellowFired=false;state.zeroFired=false;
+  state.targetEpoch=conf.type==='target'?nextTarget(conf.targetTime):0;
+  state.initialMs=conf.type==='duration'?conf.duration*1000:Math.max(0,state.targetEpoch-Date.now());
+  state.remainingMs=state.initialMs;
+  syncWake();render();
+}
+function currentMs(){
+  if(conf.type==='target'){
+    if(state.running)return state.targetEpoch-Date.now();
+    if(!state.started)return state.targetEpoch-Date.now();
+    return state.remainingMs;
+  }
+  return state.running?state.deadline-performance.now():state.remainingMs;
+}
+function formattedSeconds(ms){
+  const value=ms<=0?Math.floor(-ms/1000):Math.ceil(ms/1000);
+  const s=Math.max(0,value), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+  return h>0?String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')
+    :String(Math.floor(s/60)).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}
+function fit(){
+  const area=document.querySelector('.display');
+  const maxWidth=area.clientWidth-4, maxHeight=area.clientHeight-4;
+  if(maxWidth<=0||maxHeight<=0)return;
+  const font=Math.max(24,Math.min(maxHeight*.93,maxHeight*.73*conf.size/100));
+  display.style.fontSize=font+'px';
+  const textWidth=display.getBoundingClientRect().width;
+  if(textWidth>maxWidth){display.style.fontSize=Math.max(14,font*maxWidth/textWidth*.994)+'px';}
+}
+function soundUnlock(){
+  try{const Context=window.AudioContext||window.webkitAudioContext;
+    if(!Context)return;
+    if(!audioCtx)audioCtx=new Context();
+    if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
+  }catch(e){}
+}
+function playSound(){
+  if(!audioCtx||audioCtx.state==='closed'||conf.volume<=0)return;
+  if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
+  const base=audioCtx.currentTime+.025;
+  const steps=conf.soundType==='single'?[[0,.27,790]]:conf.soundType==='urgent'?[[0,.22,980],[.28,.22,800],[.56,.4,980]]:[[0,.14,780],[.23,.14,780],[.46,.25,930]];
+  try{
+    steps.forEach(([offset,len,freq])=>{
+      const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+      osc.type='sine';osc.frequency.value=freq;
+      const t=base+offset,level=Math.min(.24,(conf.volume/100)*.24);
+      gain.gain.setValueAtTime(.0001,t);
+      gain.gain.exponentialRampToValueAtTime(Math.max(.0002,level),t+.025);
+      gain.gain.exponentialRampToValueAtTime(.0001,t+len);
+      osc.connect(gain);gain.connect(audioCtx.destination);
+      osc.start(t);osc.stop(t+len+.04);
+    });
+  }catch(e){}
+}
+function handleAlerts(ms){
+  if(!state.running||!state.started||mode!=='timer')return;
+  const passed=100-Math.max(0,ms)/Math.max(1,state.initialMs)*100;
+  if(!state.yellowFired&&passed>=conf.threshold){
+    state.yellowFired=true;
+    if(ms>0&&conf.soundAtYellow)playSound();
+  }
+  if(!state.zeroFired&&ms<=0){
+    state.zeroFired=true;
+    if(conf.soundAtZero)playSound();
+  }
+}
+function render(){
+  if(mode==='clock'){
+    const now=new Date();
+    display.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    display.style.color='#00FF00';status.textContent='Hora actual';
+    $('modeBtn').textContent='Modo temporizador';$('settingsBtn').hidden=true;$('controls').hidden=true;
+    fit();return;
+  }
+  $('modeBtn').textContent='Modo reloj';$('settingsBtn').hidden=false;$('controls').hidden=false;
+  const ms=currentMs();
+  handleAlerts(ms);
+  const passed=state.started?100-Math.max(0,ms)/Math.max(1,state.initialMs)*100:0;
+  display.textContent=formattedSeconds(ms);
+  display.style.color=ms<=0?'#FF0000':passed>=conf.threshold?'#FFFF00':'#00FF00';
+  status.textContent=ms<=0?'Tiempo extra':conf.type==='target'?'Hasta las '+conf.targetTime:state.running?'En curso':'Temporizador';
+  if(!state.running&&state.started&&ms>0)status.textContent='En pausa';
+  start.textContent=state.running?'Pausar':'Iniciar';
+  fit();
+}
+async function syncWake(){
+  const needed=(state.running&&mode==='timer')||mode==='clock';
+  if(!needed||document.visibilityState!=='visible'){
+    if(wakeLock){try{await wakeLock.release();}catch(e){}wakeLock=null;}
+    return;
+  }
+  if(wakeLock||!('wakeLock' in navigator))return;
+  try{wakeLock=await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release',()=>{wakeLock=null;},{once:true});
+  }catch(e){}
+}
+function toggle(){
+  if(mode!=='timer')return;
+  soundUnlock();
+  if(state.running){state.remainingMs=currentMs();state.running=false;}
+  else{
+    if(!state.started){
+      if(conf.type==='target'){
+        if(state.targetEpoch<=Date.now())state.targetEpoch=nextTarget(conf.targetTime);
+        state.remainingMs=state.targetEpoch-Date.now();
+      }else state.remainingMs=conf.duration*1000;
+      state.initialMs=Math.max(1,state.remainingMs);
+      state.started=true;
+      state.yellowFired=false;state.zeroFired=false;
+    }
+    state.running=true;
+    if(conf.type==='duration')state.deadline=performance.now()+state.remainingMs;
+  }
+  syncWake();render();
+}
+function parseDuration(input){
+  const text=input.trim();
+  if(!/^\d{1,5}:\d{1,2}(?::\d{1,2})?$/.test(text))return null;
+  const parts=text.split(':').map(Number);
+  let seconds;
+  if(parts.length===2){
+    if(parts[1]>59)return null;
+    seconds=parts[0]*60+parts[1];
+  }else{
+    if(parts[0]>999||parts[1]>59||parts[2]>59)return null;
+    seconds=parts[0]*3600+parts[1]*60+parts[2];
+  }
+  return Number.isSafeInteger(seconds)&&seconds>=1&&seconds<=3599999?seconds:null;
+}
+function formatDurationInput(seconds){
+  const h=Math.floor(seconds/3600), m=Math.floor(seconds%3600/60), s=seconds%60;
+  return h?String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'):
+  String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function showTimerType(){
+  const type=document.querySelector('input[name="timerType"]:checked').value;
+  $('durationSection').hidden=type!=='duration';$('targetSection').hidden=type!=='target';
+}
+function updateLabels(){
+  $('thresholdValue').textContent=$('threshold').value+' %';
+  $('sizeValue').textContent=$('size').value+' %';
+  $('volumeValue').textContent=$('volume').value+' %';
+}
+function openSettings(){
+  if(state.running){state.remainingMs=currentMs();state.running=false;syncWake();}
+  document.querySelector('input[name="timerType"][value="'+conf.type+'"]').checked=true;
+  $('durationInput').value=formatDurationInput(conf.duration);
+  $('targetInput').value=conf.targetTime;
+  $('threshold').value=conf.threshold;$('size').value=conf.size;
+  $('soundAtYellow').checked=conf.soundAtYellow;$('soundAtZero').checked=conf.soundAtZero;
+  $('soundType').value=conf.soundType;$('volume').value=conf.volume;
+  showTimerType();updateLabels();$('settings').showModal();render();
+}
+$('settingsForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const type=document.querySelector('input[name="timerType"]:checked').value;
+  const duration=parseDuration($('durationInput').value);
+  if(type==='duration'&&duration===null){
+    alert('Ingresa una duración válida, por ejemplo 05:00 o 01:30:00 (segundos de 00 a 59).');$('durationInput').focus();return;
+  }
+  if(type==='target'&&!validTime($('targetInput').value)){
+    alert('Selecciona una hora válida (HH:MM).');$('targetInput').focus();return;
+  }
+  conf={type,duration:duration===null?conf.duration:duration,targetTime:$('targetInput').value||conf.targetTime,
+    threshold:Number($('threshold').value),size:Number($('size').value),
+    soundAtYellow:$('soundAtYellow').checked,soundAtZero:$('soundAtZero').checked,
+    soundType:$('soundType').value,volume:Number($('volume').value)};
+  try{localStorage.setItem(CONFIG_KEY,JSON.stringify(conf));}catch(e){}
+  $('settings').close();resetState();
+});
 $('cancelBtn').addEventListener('click',()=>$('settings').close());
-$('settingsForm').addEventListener('submit',e=>{e.preventDefault();const min=Number($('minutes').value),sec=Number($('seconds').value);if(!Number.isInteger(min)||!Number.isInteger(sec)||min<0||min>9999||sec<0||sec>59||min*60+sec<1){alert('Indica una duración de al menos un segundo.');return;}
-conf={duration:min*60+sec,threshold:Number($('threshold').value),size:Number($('size').value)};
-localStorage.setItem('temporizador-config',JSON.stringify(conf));$('settings').close();reset();});
-window.addEventListener('resize',fit);document.addEventListener('keydown',e=>{if($('settings').open)return;if(e.code==='Space'&&mode==='timer'){e.preventDefault();toggle();}if(e.key.toLowerCase()==='r'&&mode==='timer')reset();});
-render();requestAnimationFrame(tick);
+$('settingsBtn').addEventListener('click',openSettings);
+document.querySelectorAll('input[name="timerType"]').forEach(el=>el.addEventListener('change',showTimerType));
+['threshold','size','volume'].forEach(id=>$(id).addEventListener('input',updateLabels));
+$('testSound').addEventListener('click',()=>{
+  soundUnlock();
+  // Aplicar temporalmente los parámetros que el usuario está probando antes de guardar.
+  const previous=conf;conf={...conf,soundType:$('soundType').value,volume:Number($('volume').value)};
+  playSound();conf=previous;
+});
+$('modeBtn').addEventListener('click',()=>{
+  if(mode==='timer'){
+    if(state.running){state.remainingMs=currentMs();state.running=false;}
+    mode='clock';
+  }else mode='timer';
+  syncWake();render();
+});
+start.addEventListener('click',toggle);
+$('resetBtn').addEventListener('click',resetState);
+document.addEventListener('visibilitychange',()=>{syncWake();render();});
+window.addEventListener('resize',fit);
+window.addEventListener('keydown',e=>{
+  if($('settings').open)return;
+  if(e.code==='Space'&&mode==='timer'){e.preventDefault();toggle();}
+  if(e.key.toLowerCase()==='r'&&mode==='timer')resetState();
+});
+resetState();
+setInterval(render,200);
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 })();
 </script>
