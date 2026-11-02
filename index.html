@@ -17,13 +17,13 @@ body{min-height:100svh;overscroll-behavior:none}button,input{font:inherit}
 main{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom));gap:12px}
 header{width:100%;display:flex;align-items:center;justify-content:space-between;max-width:900px;gap:10px}
 header .name{font-size:13px;color:#8a8a8a;letter-spacing:.06em;text-transform:uppercase}
-#settingsBtn{background:#191919;border:1px solid #555;color:white;border-radius:12px;padding:11px 14px;cursor:pointer}
+header .tools{display:flex;gap:8px;align-items:center}#modeBtn,#settingsBtn{background:#191919;border:1px solid #555;color:white;border-radius:12px;padding:11px 14px;cursor:pointer}
 .display{display:flex;justify-content:center;align-items:center;flex:1;width:100%;min-height:100px;overflow:hidden}
 #clock{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.045em;white-space:nowrap;color:var(--accent);line-height:1;font-size:clamp(48px,24vw,240px);user-select:none;-webkit-user-select:none}
 footer{width:100%;max-width:700px;display:flex;align-items:center;gap:10px}
 footer button{min-height:54px;border-radius:14px;border:1px solid #444;background:#191919;color:#fff;cursor:pointer;flex:1;font-size:16px;font-weight:650}
 footer #startBtn{border-color:#777;background:#333}
-button:active{filter:brightness(1.35)}
+[hidden]{display:none!important}button:active{filter:brightness(1.35)}
 dialog{background:#141414;color:#fff;border:1px solid #666;border-radius:18px;width:min(92vw,430px);padding:22px;box-shadow:0 0 0 100vmax #000b}
 dialog::backdrop{background:#000b}h2{margin:0 0 20px;font-size:22px}
 label{display:block;font-size:15px;margin:15px 0 7px;color:#ddd}
@@ -31,12 +31,12 @@ input[type=number],input[type=time]{display:block;width:100%;background:#242424;
 input[type=range]{width:100%;accent-color:#00ff00}
 .small{color:#aaa;font-size:13px;line-height:1.4;margin-top:6px}
 .actions{display:flex;gap:10px;margin-top:23px}.actions button{flex:1;padding:13px;border-radius:10px;background:#333;border:1px solid #555;color:#fff}.actions .save{background:#eaeaea;color:#000}
-@media(orientation:landscape){main{padding:8px max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));gap:0}header .name{font-size:11px}#settingsBtn{padding:7px 12px}footer button{min-height:39px;font-size:13px}footer{max-width:480px}#clock{font-size:clamp(42px,34vh,260px)}}
+@media(orientation:landscape){main{padding:8px max(16px,env(safe-area-inset-right)) 8px max(16px,env(safe-area-inset-left));gap:0}header .name{font-size:11px}#settingsBtn,#modeBtn{padding:7px 12px}footer button{min-height:39px;font-size:13px}footer{max-width:480px}#clock{font-size:clamp(42px,34vh,260px)}}
 </style>
 </head>
 <body>
 <main>
-<header><span class="name" id="status">Listo</span><button id="settingsBtn" type="button" aria-label="Abrir configuración">Configurar</button></header>
+<header><span class="name" id="status">Listo</span><div class="tools"><button id="modeBtn" type="button" aria-label="Cambiar entre temporizador y reloj">Modo reloj</button><button id="settingsBtn" type="button" aria-label="Abrir configuración">Configurar</button></div></header>
 <div class="display"><div id="clock" role="timer" aria-live="off">05:00</div></div>
 <footer><button id="startBtn" type="button">Iniciar</button><button id="resetBtn" type="button">Reiniciar</button></footer>
 </main>
@@ -60,10 +60,15 @@ const $=id=>document.getElementById(id), clock=$('clock'),status=$('status'),sta
 const defaults={duration:300,threshold:75,size:100};let conf={...defaults};
 try{const stored=JSON.parse(localStorage.getItem('temporizador-config')||'{}');
 if(Number.isInteger(stored.duration)&&stored.duration>0&&stored.duration<=599999&&Number.isInteger(stored.threshold)&&stored.threshold>=1&&stored.threshold<=100&&Number.isInteger(stored.size)&&stored.size>=50&&stored.size<=150) conf=stored;}catch(e){}
-let remainingMs=conf.duration*1000, running=false, deadline=0;
+let remainingMs=conf.duration*1000, running=false, deadline=0, mode="timer";
 function fmt(seconds){const abs=Math.max(0,Math.floor(Math.abs(seconds)));return String(Math.floor(abs/60)).padStart(2,'0')+':'+String(abs%60).padStart(2,'0');}
 function remaining(){return running?deadline-performance.now():remainingMs;}
-function render(){let ms=remaining();let overtime=ms<=0;
+function render(){if(mode==='clock'){
+const now=new Date();clock.style.color='#00FF00';clock.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+status.textContent='Hora actual';$('modeBtn').textContent='Modo temporizador';$('settingsBtn').hidden=true;document.querySelector('footer').hidden=true;fit();return;
+}
+$('modeBtn').textContent='Modo reloj';$('settingsBtn').hidden=false;document.querySelector('footer').hidden=false;
+let ms=remaining();let overtime=ms<=0;
 // El color amarillo se activa cuando se ha consumido el porcentaje configurado.
 const passed=100-Math.max(0,ms)/(conf.duration*1000)*100;
 const c=overtime?'#FF0000':passed>=conf.threshold?'#FFFF00':'#00FF00';
@@ -78,12 +83,13 @@ clock.style.fontSize=Math.max(24,base*conf.size/100)+'px';
 // Medida real para evitar desbordes en pantallas con fuentes distintas.
 if(clock.scrollWidth>availableWidth){const actual=parseFloat(clock.style.fontSize);clock.style.fontSize=actual*(availableWidth/clock.scrollWidth)+'px';}
 }
-function tick(){if(running)render();requestAnimationFrame(tick);}
-function toggle(){if(running){remainingMs=deadline-performance.now();running=false;}else{deadline=performance.now()+remainingMs;running=true;requestWake();}render();}
-function reset(){running=false;remainingMs=conf.duration*1000;render();}
+function tick(){if(running||mode==='clock')render();requestAnimationFrame(tick);}
+function toggle(){if(mode!=='timer')return;if(running){remainingMs=deadline-performance.now();running=false;}else{deadline=performance.now()+remainingMs;running=true;requestWake();}render();}
+function reset(){if(mode!=='timer')return;running=false;remainingMs=conf.duration*1000;render();}
 let wakeLock=null;
 async function requestWake(){if(!('wakeLock'in navigator)||document.visibilityState!=='visible')return;try{wakeLock=await navigator.wakeLock.request('screen');}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(running&&document.visibilityState==='visible')requestWake();render();});
+$('modeBtn').addEventListener('click',()=>{if(mode==='timer'){if(running){remainingMs=deadline-performance.now();running=false;}mode='clock';requestWake();}else{mode='timer';}render();});
 start.addEventListener('click',toggle);$('resetBtn').addEventListener('click',reset);
 function openSettings(){if(running){remainingMs=deadline-performance.now();running=false;}
 $('minutes').value=Math.floor(conf.duration/60);$('seconds').value=conf.duration%60;
@@ -94,7 +100,7 @@ $('cancelBtn').addEventListener('click',()=>$('settings').close());
 $('settingsForm').addEventListener('submit',e=>{e.preventDefault();const min=Number($('minutes').value),sec=Number($('seconds').value);if(!Number.isInteger(min)||!Number.isInteger(sec)||min<0||min>9999||sec<0||sec>59||min*60+sec<1){alert('Indica una duración de al menos un segundo.');return;}
 conf={duration:min*60+sec,threshold:Number($('threshold').value),size:Number($('size').value)};
 localStorage.setItem('temporizador-config',JSON.stringify(conf));$('settings').close();reset();});
-window.addEventListener('resize',fit);document.addEventListener('keydown',e=>{if($('settings').open)return;if(e.code==='Space'){e.preventDefault();toggle();}if(e.key.toLowerCase()==='r')reset();});
+window.addEventListener('resize',fit);document.addEventListener('keydown',e=>{if($('settings').open)return;if(e.code==='Space'&&mode==='timer'){e.preventDefault();toggle();}if(e.key.toLowerCase()==='r'&&mode==='timer')reset();});
 render();requestAnimationFrame(tick);
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 })();
